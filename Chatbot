@@ -1,18 +1,26 @@
 import openai
 
-openai.api_key = "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"
+openai.api_key = "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"
+
+# Whitelist of allowed topics
+allowed_topics = ["corporate event", "India seminar", "business conference","event"]
 
 messages = []
-system_msg = input("What type of chatbot would you like to create?\n")
-messages.append({"role": "system", "content": system_msg})
 
-print("Your new assistant is ready!")
-while input != "quit()":
+print("Your HR assistant is ready!")
+while True:
     message = input()
-    messages.append({"role": "user", "content": message})
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages)
-    reply = response["choices"][0]["message"]["content"]
-    messages.append({"role": "assistant", "content": reply})
-    print("\n" + reply + "\n")
+
+    # Check if the message is related to allowed topics
+    is_allowed_topic = any(topic in message for topic in allowed_topics)
+
+    if is_allowed_topic:
+        messages.append({"role": "user", "content": message})
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages)
+        reply = response["choices"][0]["message"]["content"]
+        messages.append({"role": "assistant", "content": reply})
+        print("\n" + reply + "\n")
+    else:
+        print("I'm here to assist with topics related to corporate events in India.\n")
