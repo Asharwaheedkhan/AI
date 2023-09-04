@@ -2,25 +2,29 @@ import openai
 
 openai.api_key = "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"
 
-# Whitelist of allowed topics
-allowed_topics = ["corporate event", "India seminar", "business conference","event"]
+# Read allowed topics from a file
+with open("/Users/asharkhan/Downloads/AI/allowed_topics.txt", "r") as file:
+    allowed_topics = [line.strip() for line in file.readlines()]
 
 messages = []
 
-print("Your HR assistant is ready!")
+print("Your new assistant is ready!")
 while True:
     message = input()
 
-    # Check if the message is related to allowed topics
-    is_allowed_topic = any(topic in message for topic in allowed_topics)
+    # Check if any allowed topic is mentioned in the message (case-insensitive)
+    mentioned_topics = [topic for topic in allowed_topics if topic.lower() in message.lower()]
 
-    if is_allowed_topic:
+    if mentioned_topics:
         messages.append({"role": "user", "content": message})
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages)
-        reply = response["choices"][0]["message"]["content"]
-        messages.append({"role": "assistant", "content": reply})
-        print("\n" + reply + "\n")
     else:
-        print("I'm here to assist with topics related to corporate events in India.\n")
+        # If none of the allowed topics are mentioned, provide a prompt related to the topics
+        print("Bot: I'm here to assist with topics related to corporate events in India.\n")
+        continue
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages)
+    reply = response["choices"][0]["message"]["content"]
+    messages.append({"role": "assistant", "content": reply})
+    print("\n" + reply + "\n")
